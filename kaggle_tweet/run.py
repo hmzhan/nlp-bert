@@ -16,6 +16,7 @@ if __name__ == '__main__':
     train_label = tweet.train['target'].values
     test_input = bert_model.bert_encode(tweet.test['text'].values, max_len=160)
 
+    bert_model.build_model(max_len=160)
     train_hist = bert_model.model.fit(
         train_input,
         train_label,
