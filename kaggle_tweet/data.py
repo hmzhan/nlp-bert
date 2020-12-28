@@ -12,6 +12,6 @@ class TweetData:
         Load tweeter data
         :return: None
         """
-        self.train = pd.read_csv('/kaggle_data/train.csv')
-        self.test = pd.read_csv('/kaggle_data/test.csv')
-        self.submission = pd.read_csv('/kaggle_data/sample_submission.csv')
+        self.train = pd.read_csv('kaggle_data/train.csv')
+        self.test = pd.read_csv('kaggle_data/test.csv')
+        self.submission = pd.read_csv('kaggle_data/sample_submission.csv')
