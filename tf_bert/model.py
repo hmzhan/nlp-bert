@@ -43,7 +43,7 @@ class BertModel:
     def compile_classifier_model(self, train_ds):
         """
         Compile BERT classification model
-        :return:
+        :return: None
         """
         loss = tf.keras.losses.BinaryCrossentropy(from_logits=True)
         metrics = tf.metrics.BinaryAccuracy()
