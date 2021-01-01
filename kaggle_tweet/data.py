@@ -1,10 +1,12 @@
+import re
+import string
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import string
 from nltk.corpus import stopwords
 from collections import defaultdict, Counter
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 
 class TweetData:
@@ -160,6 +162,91 @@ class TweetData:
                 y.append(count)
         plt.figure(figsize=(16, 5))
         sns.barplot(x=y, y=x)
+
+    @staticmethod
+    def top_tweet_bigrams(corpus, n=None):
+        """
+        N-gram analysis
+        :param corpus: corpus
+        :param n: top n tweet
+        :return: None
+        """
+        vec = CountVectorizer(ngram_range=(2, 2)).fit(corpus)
+        bag_of_words = vec.transform(corpus)
+        sum_words = bag_of_words.sum(axis=0)
+        words_freq = [(word, sum_words[0, idx]) for word, idx in vec.vocabulary_.items()]
+        words_freq = sorted(words_freq, key=lambda x: x[1], reverse=True)
+        plt.figure(figsize=(16, 5))
+        x, y = map(list, zip(*words_freq[:10]))
+        sns.barplot(x=y, y=x)
+
+    @staticmethod
+    def remove_url(text):
+        """
+        Remove URL from text
+        :param text: text input
+        :return: cleaned text
+        """
+        url = re.compile(r'https?://\S+|www\.\S+')
+        return url.sub(r'', text)
+
+    @staticmethod
+    def remove_html(text):
+        """
+        Remove html from text
+        :param text: text input
+        :return: cleaned text
+        """
+        html = re.compile(r'<.*?>')
+        return html.sub(r'', text)
+
+    @staticmethod
+    def remove_emoji(text):
+        """
+        Remove emoji from text
+        :param text: text input
+        :return: cleaned text
+        """
+        emoji_pattern = re.compile(
+            "["
+            u"\U0001F600-\U0001F64F"  
+            u"\U0001F300-\U0001F5FF"  
+            u"\U0001F680-\U0001F6FF"  
+            u"\U0001F1E0-\U0001F1FF"
+            u"\U00002702-\U000027B0"
+            u"\U000024C2-\U0001F251"
+            "]+", flags=re.UNICODE
+        )
+        return emoji_pattern.sub(r'', text)
+
+    @staticmethod
+    def remove_punct(text):
+        """
+        Remove punctuations from text
+        :param text: text input
+        :return: cleaned text
+        """
+        table = str.maketrans('', '', string.punctuation)
+        return text.translate(table)
+
+    def text_clean(self):
+        """
+        Clean text input
+        :return: cleaned text
+        """
+        df = pd.concat([self.train, self.test])
+        df['text'] = df['text'].apply(lambda x: self.remove_url(x))
+        df['text'] = df['text'].apply(lambda x: self.remove_html(x))
+        df['text'] = df['text'].apply(lambda x: self.remove_emoji(x))
+        df['text'] = df['text'].apply(lambda x: self.remove_punct(x))
+        return df
+
+
+
+
+
+
+
 
 
 
