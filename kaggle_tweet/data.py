@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import string
+from nltk.corpus import stopwords
+from collections import defaultdict, Counter
 
 
 class TweetData:
@@ -95,5 +98,72 @@ class TweetData:
         ax1.set_title('Disaster')
         ax2.set_title('Not disaster')
         fig.suptitle('Average word length in each tweet')
+
+    def create_corpus(self, target):
+        """
+        Create corpus from training or test data
+        :param target: target label
+        :return: list of words
+        """
+        corpus = []
+        for x in self.train[self.train['target'] == target]['text'].str.split():
+            for i in x:
+                corpus.append(i)
+        return corpus
+
+    @staticmethod
+    def stop_word_eda(corpus):
+        """
+        Plot distribution of top stop words
+        :param corpus: corpus
+        :return: None
+        """
+        stop = set(stopwords.words('english'))
+        d = defaultdict(int)
+        for word in corpus:
+            if word in stop:
+                d[word] += 1
+        top = sorted(d.items(), key=lambda x: x[1], reverse=True)[:10]
+        plt.rcParams['figure.figsize'] = (18, 6)
+        x, y = zip(*top)
+        plt.bar(x, y)
+
+    @staticmethod
+    def punctuation_eda(corpus):
+        """
+        Plot distribution of top punctuations
+        :param corpus: corpus
+        :return: None
+        """
+        d = defaultdict()
+        special = string.punctuation
+        for x in corpus:
+            if x in special:
+                d[x] += 1
+        x, y = zip(*d.items())
+        plt.bar(x, y, color='green')
+
+    @staticmethod
+    def common_word_eda(corpus):
+        """
+        Plot distribution of most common words
+        :param corpus: corpus
+        :return: None
+        """
+        counter = Counter(corpus)
+        most_common = counter.most_common(40)
+        x = []
+        y = []
+        for word, count in most_common:
+            if word not in set(stopwords.words('english')):
+                x.append(word)
+                y.append(count)
+        plt.figure(figsize=(16, 5))
+        sns.barplot(x=y, y=x)
+
+
+
+
+
 
 
