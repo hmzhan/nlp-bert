@@ -1,5 +1,7 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 class TweetData:
@@ -50,8 +52,48 @@ class TweetData:
         plt.grid()
         plt.show()
 
+    def num_char_eda2(self):
+        """
+        Plot two distributions of number of characters
+        :return: None
+        """
+        fig, (ax1, ax2) = plt.subplot(1, 2, figsize=(10, 5))
+        pos_len = self.train[self.train['target'] == 1]['text'].str.len()
+        neg_len = self.train[self.train['target'] == 0]['text'].str.len()
+        ax1.hist(pos_len, color='blue')
+        ax1.set_title('Disaster tweets')
+        ax2.hist(neg_len, color='red')
+        ax2.set_title('Not disaster tweets')
+        fig.suptitle('Number of char in tweets')
+        plt.show()
 
+    def num_word_eda(self):
+        """
+        Plot two distributions of number of words
+        :return: None
+        """
+        fig, (ax1, ax2) = plt.subplot(1, 2, figsize=(10, 5))
+        pos_len = self.train[self.train['target'] == 1]['text'].apply(lambda x: len(x.split()))
+        neg_len = self.train[self.train['target'] == 0]['text'].apply(lambda x: len(x.split()))
+        ax1.hist(pos_len, color='blue')
+        ax1.set_title('Disaster tweets')
+        ax2.hist(neg_len, color='red')
+        ax2.set_title('Not disaster tweets')
+        fig.suptitle('Number of words in tweets')
+        plt.show()
 
-
+    def word_length_eda(self):
+        """
+        Plot two distributions of average word length
+        :return: None
+        """
+        fig, (ax1, ax2) = plt.subplot(1, 2, figsize=(10, 5))
+        pos_word = self.train[self.train['target'] == 1]['text'].apply(lambda x: np.mean(len(w) for w in x.split()))
+        neg_word = self.train[self.train['target'] == 0]['text'].apply(lambda x: np.mean(len(w) for w in x.split()))
+        sns.distplot(pos_word, ax1, color='blue')
+        sns.displot(neg_word, ax2, color='red')
+        ax1.set_title('Disaster')
+        ax2.set_title('Not disaster')
+        fig.suptitle('Average word length in each tweet')
 
 
