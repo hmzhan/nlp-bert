@@ -57,7 +57,7 @@ class TweetData:
         Plot two distributions of number of characters
         :return: None
         """
-        fig, (ax1, ax2) = plt.subplot(1, 2, figsize=(10, 5))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
         pos_len = self.train[self.train['target'] == 1]['text'].str.len()
         neg_len = self.train[self.train['target'] == 0]['text'].str.len()
         ax1.hist(pos_len, color='blue')
@@ -72,7 +72,7 @@ class TweetData:
         Plot two distributions of number of words
         :return: None
         """
-        fig, (ax1, ax2) = plt.subplot(1, 2, figsize=(10, 5))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
         pos_len = self.train[self.train['target'] == 1]['text'].apply(lambda x: len(x.split()))
         neg_len = self.train[self.train['target'] == 0]['text'].apply(lambda x: len(x.split()))
         ax1.hist(pos_len, color='blue')
@@ -87,9 +87,9 @@ class TweetData:
         Plot two distributions of average word length
         :return: None
         """
-        fig, (ax1, ax2) = plt.subplot(1, 2, figsize=(10, 5))
-        pos_word = self.train[self.train['target'] == 1]['text'].apply(lambda x: np.mean(len(w) for w in x.split()))
-        neg_word = self.train[self.train['target'] == 0]['text'].apply(lambda x: np.mean(len(w) for w in x.split()))
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+        pos_word = self.train[self.train['target'] == 1]['text'].apply(lambda x: np.mean([len(w) for w in x.split()]))
+        neg_word = self.train[self.train['target'] == 0]['text'].apply(lambda x: np.mean([len(w) for w in x.split()]))
         sns.distplot(pos_word, ax1, color='blue')
         sns.displot(neg_word, ax2, color='red')
         ax1.set_title('Disaster')
