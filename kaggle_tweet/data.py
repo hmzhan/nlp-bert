@@ -2,11 +2,15 @@ import re
 import string
 import pandas as pd
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 import seaborn as sns
 from nltk.corpus import stopwords
 from collections import defaultdict, Counter
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.decomposition import PCA, TruncatedSVD
+from wordcloud import WordCloud
 
 
 class TweetData:
@@ -240,6 +244,72 @@ class TweetData:
         df['text'] = df['text'].apply(lambda x: self.remove_emoji(x))
         df['text'] = df['text'].apply(lambda x: self.remove_punct(x))
         return df
+
+    @staticmethod
+    def word_cloud_eda(corpus):
+        """
+        Plot word cloud from corpus
+        :param corpus: corpus
+        :return: None
+        """
+        word_cloud = WordCloud(
+            background_color='black',
+            max_font_size=80
+        ).generate(''.join(corpus[:50]))
+        plt.figure(figsize=(12, 8))
+        plt.imshow(word_cloud)
+        plt.axis('off')
+        plt.show()
+
+    @staticmethod
+    def cv(data):
+        """
+        Count Vectorizer
+        :param data: input text
+        :return: embeddings, counter vectorizer
+        """
+        count_vec = CountVectorizer()
+        embeddings = count_vec.fit_transform(data)
+        return embeddings, count_vec
+
+    @staticmethod
+    def tfidf(data):
+        """
+        TFIDF transformation
+        :param data: input text
+        :return: embeddings, tfidf vectorizer
+        """
+        tfidf_vec = TfidfVectorizer()
+        embeddings = tfidf_vec.fit_transform(data)
+        return embeddings, tfidf_vec
+
+    @staticmethod
+    def plot_lsa(data, labels, plot=True):
+        """
+        Visualizing the embeddings
+        :param data: embeddings
+        :param labels: label data
+        :param plot: True or False
+        :return: None
+        """
+        lsa = TruncatedSVD(n_components=2)
+        lsa.fit(data)
+        lsa_scores = lsa.transform(data)
+        color_mapper = {label: idx for idx, label in enumerate(set(labels))}
+        color_column = [color_mapper[label] for label in labels]
+        colors = ['orange', 'blue']
+        if plot:
+            plt.scatter(lsa_scores[:,0], lsa_scores[:, 1], s=8, alpha=.8,
+                        c=labels, cmap=matplotlib.colors.ListedColormap(colors))
+            orange_patch = mpatches.Patch(color='orange', label='Not')
+            blue_patch = mpatches.Patch(color='blue', label='Real')
+            plt.legend(handles=[orange_patch, blue_patch], prop={'size': 30})
+
+
+
+
+
+
 
 
 
