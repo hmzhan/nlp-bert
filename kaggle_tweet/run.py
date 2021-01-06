@@ -1,5 +1,5 @@
 from kaggle_tweet.data import TweetData
-from kaggle_tweet.model import BertTweeterModel
+from kaggle_tweet.bert_model import BertTweeterModel
 
 URL = 'https://tfhub.dev/tensorflow/bert_en_uncased_L-24_H-1024_A-16/1'
 
