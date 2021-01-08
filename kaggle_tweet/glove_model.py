@@ -5,16 +5,17 @@ import numpy as np
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Sequential
-from keras.layers import Embedding, LSTM,Dense, SpatialDropout1D, Dropout
+from keras.layers import Embedding, LSTM, Dense, SpatialDropout1D, Dropout
 from keras.initializers import Constant
 from keras.optimizers import Adam
 
 
 class GloveTweeterModel:
     def __init__(self):
-        pass
+        self.model = None
 
-    def create_corpus_new(self, df):
+    @staticmethod
+    def create_corpus_new(df):
         """
         Create corpus
         :return: corpus
@@ -62,25 +63,26 @@ class GloveTweeterModel:
                     embedding_matrix[i] = embedding_vec
         return embedding_matrix
 
-    @staticmethod
-    def build_model(num_words, embedding_matrix, MAX_LEN):
+    def build_model(self, num_words, embedding_matrix, max_len):
         """
         Build Glove model based on Keras
-        :return:
+        :param num_words: number of words
+        :param embedding_matrix: embedding matrix
+        :param max_len: maximum length
+        :return: None
         """
         embedding = Embedding(
             num_words, 100,
             embeddings_initializer=Constant(embedding_matrix),
-            input_length=MAX_LEN,
+            input_length=max_len,
             trainable=False
         )
-        model = Sequential()
-        model.add(embedding)
-        model.add(SpatialDropout1D(0.2))
-        model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
-        model.add(Dense(1, activation='sigmoid'))
+        self.model = Sequential()
+        self.model.add(embedding)
+        self.model.add(SpatialDropout1D(0.2))
+        self.model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
+        self.model.add(Dense(1, activation='sigmoid'))
         optimizer = Adam(learning_rate=3e-4)
-        model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
-        return model
+        self.model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
 
