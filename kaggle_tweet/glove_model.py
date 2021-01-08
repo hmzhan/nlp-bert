@@ -9,6 +9,7 @@ from keras.layers import Embedding, LSTM,Dense, SpatialDropout1D, Dropout
 from keras.initializers import Constant
 from keras.optimizers import Adam
 
+
 class GloveTweeterModel:
     def __init__(self):
         pass
@@ -24,7 +25,8 @@ class GloveTweeterModel:
             corpus.append(words)
         return corpus
 
-    def load_glove_embeddings(self):
+    @staticmethod
+    def load_glove_embeddings():
         """
         Load and clean glove embeddings
         :return: embeddings
@@ -39,12 +41,46 @@ class GloveTweeterModel:
         f.close()
         return embedding_dict
 
-    def create_emb_matrix(self):
+    @staticmethod
+    def create_emb_matrix(corpus, embedding_dict):
         """
         Create embedding matrix
         :return: embedding matrix
         """
         MAX_LEN = 50
         tokenizer_obj = Tokenizer()
+        tokenizer_obj.fit_on_texts(corpus)
+        sequences = tokenizer_obj.texts_to_sequences(corpus)
+        tweet_pad = pad_sequences(sequences, maxlen=MAX_LEN, truncating='post', padding='post')
+        word_index = tokenizer_obj.word_index
+        num_words = len(word_index) + 1
+        embedding_matrix = np.zeros((num_words, 100))
+        for word, i in tqdm(word_index.items()):
+            if i < num_words:
+                embedding_vec = embedding_dict.get(word)
+                if embedding_vec is not None:
+                    embedding_matrix[i] = embedding_vec
+        return embedding_matrix
+
+    @staticmethod
+    def build_model(num_words, embedding_matrix, MAX_LEN):
+        """
+        Build Glove model based on Keras
+        :return:
+        """
+        embedding = Embedding(
+            num_words, 100,
+            embeddings_initializer=Constant(embedding_matrix),
+            input_length=MAX_LEN,
+            trainable=False
+        )
+        model = Sequential()
+        model.add(embedding)
+        model.add(SpatialDropout1D(0.2))
+        model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
+        model.add(Dense(1, activation='sigmoid'))
+        optimizer = Adam(learning_rate=3e-4)
+        model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+        return model
 
 
